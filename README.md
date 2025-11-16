@@ -5,31 +5,31 @@ The objective of this project is to support BrightTV’s CEO and the Customer Va
 
 -- 🎯 Project Objective
 
-*To analyze user profile and viewership session data to extract insights that can:
+* To analyze user profile and viewership session data to extract insights that can:
 
-*Understand user behavior and consumption trends
+* Understand user behavior and consumption trends
 
-*Identify factors that influence viewer engagement
+* Identify factors that influence viewer engagement
 
-*Recommend content strategies to improve viewership on low-consumption days
+* Recommend content strategies to improve viewership on low-consumption days
 
-*Propose initiatives to increase BrightTV’s overall user base
+* Propose initiatives to increase BrightTV’s overall user base
 
---🗂️ Contents of This Repository
+-- 🗂️ Contents of This Repository
 1.Project description & Raw data
-*Project description in pdf
-*Raw dat in csv 
+* Project description in pdf
+* Raw dat in csv 
 
 2. Project Planning
-*Miro flow chat
-*Project Gantt Chart
+* Miro flow chat
+* Project Gantt Chart
 
 3.Data Processing
-*SQL File
-*Excel Analysis File
+* SQL File
+* Excel Analysis File
 
 4.Project Presentation
-*Final Presentation
+* Final Presentation
 
 --🔍 Key Analysis Areas
 1. User & Usage Trends
