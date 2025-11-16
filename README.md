@@ -31,7 +31,7 @@ The objective of this project is to support BrightTV’s CEO and the Customer Va
 4.Project Presentation
 * Final Presentation
 
---🔍 Key Analysis Areas
+🔍 Key Analysis Areas
 
 1. User & Usage Trends
 
@@ -47,7 +47,7 @@ Highlighting which content categories should be promoted to uplift performance o
 
 4. Growth Initiatives
 
---Recommendations covering:
+-- Recommendations covering:
 
 For Low-Consumption Days:
 A. For Low-Consumption Days (i.e, Monday)
