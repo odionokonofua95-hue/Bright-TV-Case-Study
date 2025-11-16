@@ -3,7 +3,7 @@ This repository contains all analysis, code, and insights developed for the Brig
 Case Study.
 The objective of this project is to support BrightTV’s CEO and the Customer Value Management (CVM) team in driving growth in the platform’s subscription base for the current financial year.
 
---🎯 Project Objective
+-- 🎯 Project Objective
 
 *To analyze user profile and viewership session data to extract insights that can:
 
