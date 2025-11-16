@@ -47,7 +47,7 @@ Highlighting which content categories should be promoted to uplift performance o
 
 4. Growth Initiatives
 
--- Recommendations covering:
+- Recommendations covering:
 
 For Low-Consumption Days:
 A. For Low-Consumption Days (i.e, Monday)
