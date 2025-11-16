@@ -1,0 +1,336 @@
+SELECT
+  *
+FROM
+  "BRIGHT"."TV_USERPROFILES"."DATA"
+LIMIT
+  10;
+
+-------------------------------------------------
+SELECT * 
+FROM BRIGHT.TV_USERPROFILES.DATA;
+
+SELECT * 
+FROM BRIGHT.TV_VIEWERSHIP.DATA;
+
+
+-- General checks
+
+SELECT 
+    MIN(age),
+    MAX(age)
+FROM BRIGHT.TV_USERPROFILES.DATA;
+
+--AVG(duration_2)
+SELECT 
+    MIN(DURATION2),
+    MAX(DURATION2),
+FROM BRIGHT.TV_VIEWERSHIP.DATA;
+
+-- Checking number of records
+
+SELECT COUNT(*)
+FROM BRIGHT.TV_USERPROFILES.DATA;
+
+SELECT COUNT(DISTINCT UserID)
+FROM BRIGHT.TV_VIEWERSHIP.DATA;
+
+SELECT COUNT(*)
+FROM bright.tv_viewership.data;
+
+SELECT COUNT(userid)
+FROM bright.tv_viewership.data;
+
+
+-- Checking for completely duplicates rows
+
+SELECT *, 
+    COUNT(*)
+FROM bright.tv_userprofiles.data
+GROUP BY ALL
+HAVING COUNT(*) > 1;
+
+SELECT *, 
+    COUNT(*)
+FROM bright.tv_viewership.data
+GROUP BY ALL
+HAVING COUNT(*) > 1;
+--(5 records with duplicates)
+
+
+
+-- Create a temporary table with no duplicates as New_TV_Viwership
+
+SELECT DISTINCT *
+FROM bright.car_sales.data;
+
+CREATE OR REPLACE TEMPORARY TABLE New_Tv_Viewership AS
+SELECT DISTINCT
+    *,
+    TO_TIMESTAMP(recorddate2, 'YYYY/MM/DD HH24:MI') AS record_timestamp,
+    CAST(TO_TIMESTAMP(recorddate2, 'YYYY/MM/DD HH24:MI') AS DATE) AS record_date,
+    CAST(TO_TIMESTAMP(recorddate2, 'YYYY/MM/DD HH24:MI') AS TIME) AS record_time
+FROM bright.tv_viewership.data;
+
+SELECT*
+FROM NEW_TV_VIEWERSHIP;
+
+SELECT *, 
+    COUNT(*)
+FROM NEW_TV_VIEWERSHIP
+GROUP BY ALL
+HAVING COUNT(*) > 1;
+
+SELECT COUNT(*)
+FROM NEW_TV_VIEWERSHIP;
+
+
+
+-- Check if missing values in the tables
+
+SELECT * FROM BRIGHT.TV_USERPROFILES.DATA
+WHERE userid IS NULL OR NAME IS NULL OR surname IS NULL OR email IS NULL OR gender IS NULL OR RACE IS NULL OR AGE IS NULL OR PROVINCE IS NULL OR SOCIAL_MEDIA_HANDLE IS NULL;
+
+SELECT * FROM NEW_TV_VIEWERSHIP
+WHERE userid IS NULL OR channel2 IS NULL OR duration2 IS NULL OR RecordDate2 IS NULL;
+
+
+-- Replace missing records with 'None' and creating a temp table
+
+CREATE OR REPLACE TEMP TABLE New_User_Profile AS (
+    SELECT 
+        userid,
+        age,
+        IFNULL(name, 'None') AS Name,
+        IFNULL(surname, 'None') AS Surname,
+        IFNULL(email, 'None') AS email,
+        IFNULL(gender, 'None') AS Gender,
+        IFNULL(race, 'None') AS Race,
+        IFNULL(province, 'None') AS Province,
+        IFNULL(social_media_handle, 'None') AS social_media_handle,
+        CASE
+            WHEN age BETWEEN 1 AND 12 THEN 'Child'
+            WHEN age BETWEEN 13 AND 25 THEN 'Adolescent'
+            WHEN age BETWEEN 26 AND 44 THEN 'Adult'
+            WHEN age >= 45 THEN 'Older Adult'
+            ELSE 'Not Specified'
+        END AS Age_group
+    FROM BRIGHT.TV_USERPROFILES.DATA
+);
+
+
+-- Display users who have watched something, with the channels watched and the time of day.
+
+SELECT
+    u.userid,
+    u.Name,
+    u.Surname,
+    u.Gender,
+    u.Race,
+    u.Province,
+    u.Age_group,
+    v.channel2,
+    v.duration2,
+    CASE
+        WHEN v.duration2 between '00:00:00' AND '02:59:59' THEN '0 - 3 Hrs'
+        WHEN v.duration2 between '03:00:00' AND '05:59:59' THEN '3 - 6 Hrs'
+        WHEN v.duration2 between '06:00:00' AND '08:59:59' THEN '6 - 9 Hrs'
+        ELSE '9 - 12 Hrs'
+    END AS Watch_Duration,
+    v.record_date,
+    v.record_time,
+    CASE
+        WHEN v.record_time between '06:00:00' AND '11:59:59' THEN 'Morning'
+        WHEN v.record_time between '12:00:00' AND '17:59:59' THEN 'Afternoon'
+        WHEN v.record_time between '18:00:00' AND '23:59:59' THEN 'Evening'
+        ELSE 'Night'
+    END AS Time_Category,
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid;
+
+
+-- Show the users and viewership per channel
+
+SELECT
+    v.channel2 AS Channel,
+    COUNT(u.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY v.channel2
+ORDER BY user_count DESC;
+
+-- Show the users and viewership per province
+
+SELECT
+    u.province,
+    COUNT(u.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY 1
+ORDER BY user_count DESC;
+
+-- Show the users and viewership per race
+
+SELECT
+    u.race,
+    COUNT(u.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY 1
+ORDER BY user_count DESC;
+
+-- Display the count of users and viewership per time of day
+
+SELECT
+    CASE
+        WHEN v.record_time between '06:00:00' AND '11:59:59' THEN 'Morning'
+        WHEN v.record_time between '12:00:00' AND '17:59:59' THEN 'Afternoon'
+        WHEN v.record_time between '18:00:00' AND '23:59:59' THEN 'Evening'
+        ELSE 'Night'
+    END AS Time_Type,
+    COUNT(u.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY 1;
+
+
+
+-- Display the count of users and viewership per duration
+
+SELECT
+    CASE
+        WHEN v.duration2 between '00:00:00' AND '02:59:59' THEN '0 - 3 Hrs'
+        WHEN v.duration2 between '03:00:00' AND '05:59:59' THEN '3 - 6 Hrs'
+        WHEN v.duration2 between '06:00:00' AND '08:59:59' THEN '6 - 9 Hrs'
+        ELSE '9 - 12 Hrs'
+    END AS Watch_Duration,
+    COUNT(u.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY 1;
+
+
+
+-- Display the average duration per channel
+
+-- SELECT
+--     v.channel2 AS channel,
+--     AVG(v.duration_2)
+-- FROM user_profiles_new AS u
+-- INNER JOIN viewership_new AS v ON u.userid = v.userid
+-- GROUP BY 1;
+
+
+
+-- Display the count of users and viewership per age group
+
+SELECT
+    Age_group,
+    COUNT(v.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY 1;
+
+
+-- Display the count of users and viewership per gender
+
+SELECT
+    gender,
+    COUNT(v.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY 1;
+
+
+
+-- Display the count of users and viewership by month
+
+SELECT
+    Record_date,
+    COUNT(v.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY 1;
+
+
+-- Display the count of users and viewership by Day
+
+SELECT
+    Record_date,
+    COUNT(v.userid) AS user_count
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v ON u.userid = v.userid
+GROUP BY 1;
+
+-------------------------Main data Code-------
+SELECT
+    u.userid,
+    u.Name,
+    u.Surname,
+    u.Gender,
+    u.Race,
+    u.Province,
+    u.Age_group,
+    v.channel2,
+    v.duration2,
+    CASE
+        WHEN v.duration2 BETWEEN '00:00:00' AND '02:59:59' THEN '0 - 3 Hrs'
+        WHEN v.duration2 BETWEEN '03:00:00' AND '05:59:59' THEN '3 - 6 Hrs'
+        WHEN v.duration2 BETWEEN '06:00:00' AND '08:59:59' THEN '6 - 9 Hrs'
+        ELSE '9 - 12 Hrs'
+    END AS Watch_Duration,
+    v.record_date,
+    v.record_time,
+    CASE
+        WHEN v.record_time BETWEEN '06:00:00' AND '11:59:59' THEN 'Morning'
+        WHEN v.record_time BETWEEN '12:00:00' AND '17:59:59' THEN 'Afternoon'
+        WHEN v.record_time BETWEEN '18:00:00' AND '23:59:59' THEN 'Evening'
+        ELSE 'Night'
+    END AS Time_Category,
+    CASE 
+        WHEN DAYOFWEEK(v.record_date) IN (1, 7) THEN 'Weekend'
+        ELSE 'Weekday'
+    END AS Day_Type
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v 
+    ON u.userid = v.userid;
+
+    ----------------code includes weekday----
+    SELECT
+    u.userid,
+    u.Name,
+    u.Surname,
+    u.Gender,
+    u.Race,
+    u.Province,
+    u.Age_group,
+    v.channel2,
+    v.duration2,
+    CASE
+        WHEN v.duration2 BETWEEN '00:00:00' AND '02:59:59' THEN '0 - 3 Hrs'
+        WHEN v.duration2 BETWEEN '03:00:00' AND '05:59:59' THEN '3 - 6 Hrs'
+        WHEN v.duration2 BETWEEN '06:00:00' AND '08:59:59' THEN '6 - 9 Hrs'
+        ELSE '9 - 12 Hrs'
+    END AS Watch_Duration,
+    
+    v.record_date,
+    v.record_time,
+
+    CASE
+        WHEN v.record_time BETWEEN '06:00:00' AND '11:59:59' THEN 'Morning'
+        WHEN v.record_time BETWEEN '12:00:00' AND '17:59:59' THEN 'Afternoon'
+        WHEN v.record_time BETWEEN '18:00:00' AND '23:59:59' THEN 'Evening'
+        ELSE 'Night'
+    END AS Time_Category,
+
+    -- Day of the week (Monday, Tuesday, etc.)
+    DAYNAME(v.record_date) AS Day_Name,
+
+    -- Weekend vs Weekday
+    CASE 
+        WHEN DAYOFWEEK(v.record_date) IN (1, 7) THEN 'Weekend'
+        ELSE 'Weekday'
+    END AS Day_Type
+
+FROM New_User_Profile AS u
+INNER JOIN New_TV_Viewership AS v 
+    ON u.userid = v.userid;
