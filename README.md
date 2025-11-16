@@ -47,32 +47,36 @@ Highlighting which content categories should be promoted to uplift performance o
 
 4. Growth Initiatives
 
-- Recommendations covering:
+## Recommendations covering:
 
 For Low-Consumption Days:
-A. For Low-Consumption Days (i.e, Monday)
+That is Monday's and Tuesday's:
 
-Recommend these:
 1.Short-form highlight reels
 – Suitable for tired or transitioning viewers.
+
 2.Comedy, reality TV, or music shows
 – Low cognitive load, improves engagement
 on quiet days.
+
 3.Weekly “Start your Week” themed shows
 – Light entertainment, motivational content.
+
 4.Exclusive Friday drops
-– Release new episodes on historically low
-days to draw viewers.
+– Release new episodes on historically low days to draw viewers.
+
 5.Interactive content
 – Polls, votes, viewer-created challenges.
 
-For Low-Consumption Times (i.e, Night)
+For Low-Consumption Times
+That is Night and Evenings
+
 Introduce:
 •Quick news roundups
 •Kids’ content for morning school prep
 •Late-night talk shows or music shows
 
-**🧰 Tools & Technologies
+🧰 Tools & Technologies
 
 *SQL
 *Snowflake 
